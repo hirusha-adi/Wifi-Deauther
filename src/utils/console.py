@@ -24,3 +24,7 @@ def success(*args, **kwargs):
 
 def error(*args, **kwargs):
     print(Colors.RED, *args, **kwargs)
+
+
+def print_(*args, **kwargs):
+    print(Colors.RESET, *args, **kwargs)
