@@ -1,5 +1,4 @@
 """
-
 -----------------------------
 enable monitor mode
 -----------------------------
@@ -21,7 +20,6 @@ airodump-ng wlan0
 -----------------------------
 aireplay-ng --deauth <number of deauth packets> -a <target BSSID> wlan0
 -----------------------------
-
 """
 
 import subprocess
@@ -36,7 +34,7 @@ from src.utils import config
 def selectAdapter() -> WirelessAdapter:
     adapters = commands.getAdapters()
     c = 0
-    print("Please select an adpater: ")
+    print("[?] Please select an adpater -> ")
     for adapter in adapters:
         print(f"\t{c}: {adapter.name}")
         c += 1
@@ -46,7 +44,7 @@ def selectAdapter() -> WirelessAdapter:
             if indx <= c:
                 break
         except ValueError:
-            print("Please enter a number")
+            print("[?] Please enter a number> ")
     return adapters[indx]
 
 
@@ -56,4 +54,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
+    except Exception as e:
+        print(f"error occured: {e}")
+    finally:
+        pass
