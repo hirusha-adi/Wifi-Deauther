@@ -30,6 +30,7 @@ import sys
 
 from src.adapters.wireless import WirelessAdapter
 from src.utils import commands
+from src.utils import config
 
 
 def loadAdapters() -> t.List[WirelessAdapter]:
@@ -55,7 +56,7 @@ def selectAdapter() -> WirelessAdapter:
 
 def main():
     adapter = selectAdapter()
-    setMonitorMode(adapter=adapter)
+    config.setMonitorMode(adapter=adapter)
 
 
 if __name__ == "__main__":
