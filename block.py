@@ -33,12 +33,8 @@ from src.utils import commands
 from src.utils import config
 
 
-def loadAdapters() -> t.List[WirelessAdapter]:
-    return [WirelessAdapter(output=a) for a in commands.iwconfig()]
-
-
 def selectAdapter() -> WirelessAdapter:
-    adapters = loadAdapters()
+    adapters = commands.getAdapters()
     c = 0
     print("Please select an adpater: ")
     for adapter in adapters:
