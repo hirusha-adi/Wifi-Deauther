@@ -26,18 +26,26 @@ aireplay-ng --deauth <number of deauth packets> -a <target BSSID> wlan0
 
 import subprocess
 import typing as t
+
 from src.adapters.wireless import WirelessAdapter
+from src.utils import commands
 
 
-# output = subprocess.check_output(["ifconfig"]).decode()
+def loadAdapters():
+
+    try:
+        adapters = commands.iwconfig()
+    except Exception as e:
+        print(e)
+
+    for a in adapters:
+        obj = WirelessAdapter(output=a)
+        print(obj)
 
 
-with open("iwconfig.txt") as _f:
-    iwconfig = _f.read()
-
-adapters = [adapter.strip() for adapter in iwconfig.split('\n\n')]
+def main():
+    loadAdapters()
 
 
-for a in adapters:
-    obj = WirelessAdapter(output=a)
-    print(obj)
+if __name__ == "__main__":
+    main()
