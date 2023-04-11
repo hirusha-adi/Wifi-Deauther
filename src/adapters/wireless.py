@@ -1,4 +1,7 @@
-class iWconfig():
+import typing as t
+
+
+class WirelessAdapter():
     def __init__(self, output: str) -> None:
         self.output = output
 
