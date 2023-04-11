@@ -1,7 +1,7 @@
 import sys
 
 
-class Colors:
+class _Colors:
     BLACK = '\033[30m'
     RED = '\033[31m'
     GREEN = '\033[32m'
@@ -14,17 +14,17 @@ class Colors:
     RESET = '\033[0m'
 
 
-def doing(*args, **kwargs):
-    print(Colors.BLUE, *args, **kwargs)
+def blue(*args, **kwargs):
+    print(_Colors.BLUE, *args, **kwargs)
 
 
-def success(*args, **kwargs):
-    print(Colors.GREEN, *args, **kwargs)
+def green(*args, **kwargs):
+    print(_Colors.GREEN, *args, **kwargs)
 
 
-def error(*args, **kwargs):
-    print(Colors.RED, *args, **kwargs)
+def red(*args, **kwargs):
+    print(_Colors.RED, *args, **kwargs)
 
 
 def print_(*args, **kwargs):
-    print(Colors.RESET, *args, **kwargs)
+    print(_Colors.RESET, *args, **kwargs)
