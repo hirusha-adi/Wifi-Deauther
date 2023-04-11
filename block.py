@@ -4,61 +4,93 @@ import typing as t
 # output = subprocess.check_output(["ifconfig"]).decode()
 
 
-class Adapter():
-    def __init__(self, output: str, _type: t.Literal["ifconfig", "iwconfig"]) -> None:
+class iWconfig():
+    def __init__(self, output: str) -> None:
         self.output = output
-        self._type = _type
 
         # for support
-        self.error = False
+        self._error = False
 
         # properties
-        self.name = None
-        self.mode = None
-        self.isConnectedToWifi = False
-        self.essid = None
-        self.frequency = None
-        self.access_point = None
-        self.bit_rate = None
-        self.tx_power = None
+        self._name = None
+        self._mode = None
+        self._isConnectedToWifi = False
+        self._essid = None
+        self._frequency = None
+        self._access_point = None
+        self._bit_rate = None
+        self._tx_power = None
 
         self.extractData()
 
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def mode(self) -> str:
+        return self._mode
+
+    @property
+    def isConnected(self) -> bool:
+        return self._isConnectedToWifi
+
+    @property
+    def essid(self) -> str:
+        return self._essid
+
+    @property
+    def frequency(self) -> str:
+        return self._frequency
+
+    @property
+    def access_point(self) -> str:
+        return self._access_point
+
+    @property
+    def bitrate(self) -> str:
+        return self._bit_rate
+
+    @property
+    def tx_power(self) -> str:
+        return self._tx_power
+
     def extractData(self) -> None:
 
-        if self._type == "iwconfig":
+        if not self._error:
+            # name
+            try:
+                self._name = self.output.split()[0]
+            except IndexError:
+                self._error = True
+                return
 
-            if not self.error:
-                # name
-                try:
-                    self.name = self.output.split()[0]
-                except IndexError:
-                    self.error = True
-                    return
+            # mode
+            for line in self.output.split('\n'):
+                if 'Mode:' in line:
+                    self._mode = line.split('Mode:')[1].split()[0]
 
-                # mode
+            # if connected to a network
+            if 'ESSID:' in self.output:
+                self._isConnectedToWifi = True
+                self._essid = self.output.split('ESSID:"')[1].split('"')[0]
                 for line in self.output.split('\n'):
-                    if 'Mode:' in line:
-                        self.mode = line.split('Mode:')[1].split()[0]
+                    if 'Frequency:' in line:
+                        self._frequency = line.split()[1].split(":")[-1]
+                    if 'Access Point:' in line:
+                        self._access_point = line.split()[-1]
+                    if 'Bit Rate=' in line:
+                        self._bit_rate = line.split()[1].split("=")[-1]
+                    if 'Tx-Power=' in line:
+                        self._tx_power = line.split('=')[-1].strip()
 
-                # if connected to a network
-                if 'ESSID:' in self.output:
-                    self.isConnectedToWifi = True
-                    self.essid = self.output.split('ESSID:"')[1].split('"')[0]
-                    for line in self.output.split('\n'):
-                        if 'Frequency:' in line:
-                            self.frequency = line.split()[1].split(":")[-1]
-                        if 'Access Point:' in line:
-                            self.access_point = line.split()[-1]
-                        if 'Bit Rate=' in line:
-                            self.bit_rate = line.split()[1]
-                        if 'Tx-Power=' in line:
-                            self.tx_power = line.split('=')[-1].strip()
+        else:
+            return
 
     def __repr__(self) -> str:
-        txt = f'<Adapter name="{self.name}" mode="{self.mode}" isConnected={self.isConnectedToWifi}'
-        if self.isConnectedToWifi:
-            txt += f' frequency="{self.frequency}" accessPoint="{self.access_point}" bitrate="{self.bit_rate}" txpower="{self.tx_power}"'
+        txt = f'<Adapter name="{self._name}" mode="{self._mode}" isConnected={self._isConnectedToWifi}'
+        if self._isConnectedToWifi:
+            txt += f' frequency="{self._frequency}" accessPoint="{self._access_point}" bitrate="{self._bit_rate}" txpower="{self._tx_power}"'
         txt += ">"
         return txt
 
@@ -70,5 +102,5 @@ adapters = [adapter.strip() for adapter in iwconfig.split('\n\n')]
 
 
 for a in adapters:
-    obj = Adapter(output=a, _type="iwconfig")
+    obj = iWconfig(output=a)
     print(obj)
