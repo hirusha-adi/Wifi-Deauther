@@ -3,22 +3,16 @@ import time
 
 from src.adapters.wireless import WirelessAdapter
 from src.utils import commands
+from src.utils.console import *
 
 
-def __setMonitorModeAuto(adapter: WirelessAdapter) -> None:
+def spoofMACaddress(adapter: WirelessAdapter) -> None:
     # ---------------------
-    # airmon-ng start wlan0
     # ifconfig wlan0 down
     # macchanger -r wlan0
     # ifconfig wlan0 up
     # ---------------------
-
     stuff = [
-        {
-            "message": f"Enabling Monitor Mode using the aircrack-ng suite {adapter.name}",
-            "message2": "Running {cmnd}",
-            "command": ["airmon-ng", "start", adapter.name]
-        },
         {
             "message": f"Disabling {adapter.name}",
             "message2": "Running {cmnd}",
@@ -36,12 +30,27 @@ def __setMonitorModeAuto(adapter: WirelessAdapter) -> None:
         }
     ]
     for dic in stuff:
-        print(dic['message'])
+        blue(dic['message'])
         try:
-            print(dic["message2"].format(cmnd=' '.join(dic["command"])))
+            blue(dic["message2"].format(cmnd=' '.join(dic["command"])))
             subprocess.check_call(dic["command"])
         except subprocess.CalledProcessError as e:
-            print("Command failed with error code:", e.returncode)
+            red("Command failed with error code:", e.returncode)
+
+
+def __setMonitorModeAuto(adapter: WirelessAdapter) -> None:
+    # ---------------------
+    # airmon-ng start wlan0
+    # ---------------------
+
+    spoofMACaddress()
+
+    blue(f"Enabling Monitor Mode using the aircrack-ng suite {adapter.name}")
+    try:
+        blue(f"Running airmon-ng start {adapter.name}")
+        subprocess.check_call(["airmon-ng", "start", adapter.name])
+    except subprocess.CalledProcessError as e:
+        red("Command failed with error code:", e.returncode)
 
 
 def __setMonitorModeCustom(adapter: WirelessAdapter) -> None:
@@ -74,21 +83,21 @@ def __setMonitorModeCustom(adapter: WirelessAdapter) -> None:
         }
     ]
     for dic in stuff:
-        print(dic['message'])
+        blue(dic['message'])
         try:
-            print(dic["message2"].format(cmnd=' '.join(dic["command"])))
+            blue(dic["message2"].format(cmnd=' '.join(dic["command"])))
             subprocess.check_call(dic["command"])
         except subprocess.CalledProcessError as e:
-            print("Command failed with error code:", e.returncode)
+            red("Command failed with error code:", e.returncode)
 
 
 def setMonitorMode(adapter: WirelessAdapter) -> None:
-    print("Killing unwanted processes successfully")
+    blue("Killing unwanted processes")
     try:
-        print("Running: 'airmon-ng check kill'")
+        blue("Running: 'airmon-ng check kill'")
         subprocess.check_call(["airmon-ng", "check", "kill"])
     except subprocess.CalledProcessError as e:
-        print("Command failed with error code:", e.returncode)
+        red("Command failed with error code:", e.returncode)
 
     __setMonitorModeAuto(adapter=adapter)
     __setMonitorModeCustom(adapter=adapter)
@@ -97,10 +106,8 @@ def setMonitorMode(adapter: WirelessAdapter) -> None:
         if adp2.name == adapter.name:
             print(f"Mode of {adapter.name}: {adp2.mode}")
             if adp2.mode == "Monitor":
-                return
+                print(f"{adapter.name} set to Monitor Mode successfully.")
             else:
-                print(
-                    "Mode has not been changed to Monitor. Trying again in 3 seconds."
-                )
+                print("Mode has not been changed to Monitor. Trying again in 3 seconds.")
                 time.sleep(3)
                 setMonitorMode()
