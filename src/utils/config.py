@@ -167,14 +167,15 @@ def __restoreCustom(adapter: WirelessAdapter) -> None:
         for item in cmd['cmnds']:
             yellow(f"[*] {item['desc']}")
             os.system(item['cmd'])
+            time.sleep(1)
 
 
 def restore(adapter: WirelessAdapter) -> None:
 
-    restoreMACAddress()
+    restoreMACAddress(adapter=adapter)
 
-    # __restoreAuto()
-    __restoreCustom()
+    # __restoreAuto(adapter=adapter)
+    __restoreCustom(adapter=adapter)
 
     cmnds = [
         {

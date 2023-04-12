@@ -29,6 +29,9 @@ import sys
 from src.adapters.wireless import WirelessAdapter
 from src.utils import commands
 from src.utils import config
+from src.utils.console import *
+
+workingAdapter = None
 
 
 def selectAdapter() -> WirelessAdapter:
@@ -49,8 +52,9 @@ def selectAdapter() -> WirelessAdapter:
 
 
 def main():
-    adapter = selectAdapter()
-    config.setMonitorMode(adapter=adapter)
+    global workingAdapter
+    workingAdapter = selectAdapter()
+    config.setMonitorMode(adapter=workingAdapter)
 
 
 if __name__ == "__main__":
@@ -61,4 +65,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"error occured: {e}")
     finally:
-        pass
+        config.restore(adapter=workingAdapter)
