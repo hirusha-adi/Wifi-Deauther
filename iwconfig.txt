@@ -1,9 +1,0 @@
-wlan0     IEEE 802.11  ESSID:"SLT_FIBER"  
-          Mode:Managed  Frequency:2.412 GHz  Access Point: 5C:E8:83:4D:5C:18   
-          Bit Rate=86.7 Mb/s   Tx-Power=20 dBm   
-          Retry short limit:7   RTS thr:off   Fragment thr:off
-          Power Management:on
-          Link Quality=66/70  Signal level=-44 dBm  
-          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
-          Tx excessive retries:0  Invalid misc:43   Missed beacon:0
-
