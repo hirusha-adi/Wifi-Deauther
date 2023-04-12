@@ -1,5 +1,6 @@
 import subprocess
 import time
+import os
 
 from src.adapters.wireless import WirelessAdapter
 from src.utils import commands
@@ -32,10 +33,29 @@ def spoofMACaddress(adapter: WirelessAdapter) -> None:
     for dic in stuff:
         blue(dic['message'])
         try:
-            blue(dic["message2"].format(cmnd=' '.join(dic["command"])))
+            yellow(dic["message2"].format(cmnd=' '.join(dic["command"])))
             subprocess.check_call(dic["command"])
         except subprocess.CalledProcessError as e:
             red("Command failed with error code:", e.returncode)
+
+
+def restoreMACAddress(adapter: WirelessAdapter) -> None:
+    cmnds = [
+        {
+            "msg": f"Restoring Mac Address for {adapter.name}",
+            "cmnds": [
+                {"desc": f"[*] Running 'ifconfig {adapter.name} down'", "cmd": f"ifconfig {adapter.name} down"},
+                {"desc": f"Running 'macchanger -p {adapter.name}'", "cmd": f"macchanger -p {adapter.name}"},
+                {"desc": f"Running 'ifconfig {adapter.name} up'", "cmd": f"ifconfig {adapter.name} up"}
+            ]
+        }
+    ]
+
+    for cmd in cmnds:
+        blue(f"[*] {cmd['msg']}")
+        for item in cmd['cmnds']:
+            yellow(f"[*] {item['desc']}")
+            os.system(item['cmd'])
 
 
 def __setMonitorModeAuto(adapter: WirelessAdapter) -> None:
@@ -47,7 +67,7 @@ def __setMonitorModeAuto(adapter: WirelessAdapter) -> None:
 
     blue(f"Enabling Monitor Mode using the aircrack-ng suite {adapter.name}")
     try:
-        blue(f"Running airmon-ng start {adapter.name}")
+        yellow(f"Running airmon-ng start {adapter.name}")
         subprocess.check_call(["airmon-ng", "start", adapter.name])
     except subprocess.CalledProcessError as e:
         red("Command failed with error code:", e.returncode)
@@ -78,14 +98,14 @@ def __setMonitorModeCustom(adapter: WirelessAdapter) -> None:
         },
         {
             "message": f"Enabling {adapter.name}",
-            "message": "Running {cmnd}",
+            "message2": "Running {cmnd}",
             "command": ["ifconfig", adapter.name, "up"]
         }
     ]
     for dic in stuff:
         blue(dic['message'])
         try:
-            blue(dic["message2"].format(cmnd=' '.join(dic["command"])))
+            yellow(dic["message2"].format(cmnd=' '.join(dic["command"])))
             subprocess.check_call(dic["command"])
         except subprocess.CalledProcessError as e:
             red("Command failed with error code:", e.returncode)
@@ -94,7 +114,7 @@ def __setMonitorModeCustom(adapter: WirelessAdapter) -> None:
 def setMonitorMode(adapter: WirelessAdapter) -> None:
     blue("Killing unwanted processes")
     try:
-        blue("Running: 'airmon-ng check kill'")
+        yellow("Running: 'airmon-ng check kill'")
         subprocess.check_call(["airmon-ng", "check", "kill"])
     except subprocess.CalledProcessError as e:
         red("Command failed with error code:", e.returncode)
@@ -111,3 +131,62 @@ def setMonitorMode(adapter: WirelessAdapter) -> None:
                 print("Mode has not been changed to Monitor. Trying again in 3 seconds.")
                 time.sleep(3)
                 setMonitorMode()
+
+
+def __restoreAuto(adapter: WirelessAdapter) -> None:
+    cmnds = [
+        {
+            "msg": f"Disabling Monitor Mode for {adapter.name}",
+            "cmnds": [
+                {"desc": f"[*] Running 'airmon-ng stop {adapter.name}'", "cmd": f"airmon-ng stop {adapter.name}"}
+            ]
+        }
+    ]
+
+    for cmd in cmnds:
+        blue(f"[*] {cmd['msg']}")
+        for item in cmd['cmnds']:
+            yellow(f"[*] {item['desc']}")
+            os.system(item['cmd'])
+
+
+def __restoreCustom(adapter: WirelessAdapter) -> None:
+    cmnds = [
+        {
+            "msg": f"Disabling Monitor Mode for {adapter.name}",
+            "cmnds": [
+                {"desc": f"[*] Running 'ifconfig {adapter.name} down'", "cmd": f"ifconfig {adapter.name} down"},
+                {"desc": f"Running 'iwconfig {adapter.name} mode managed'", "cmd": f"ifconfig {adapter.name} mode managed"},
+                {"desc": f"Running 'ifconfig {adapter.name} up'", "cmd": f"ifconfig {adapter.name} up"}
+            ]
+        }
+    ]
+
+    for cmd in cmnds:
+        blue(f"[*] {cmd['msg']}")
+        for item in cmd['cmnds']:
+            yellow(f"[*] {item['desc']}")
+            os.system(item['cmd'])
+
+
+def restore(adapter: WirelessAdapter) -> None:
+
+    restoreMACAddress()
+
+    # __restoreAuto()
+    __restoreCustom()
+
+    cmnds = [
+        {
+            "msg": "Starting Services",
+            "cmnds": [
+                {"desc": f"[*] Running 'systemctl start NetworkManager'", "cmd": f"systemctl start NetworkManager"},
+            ]
+        }
+    ]
+
+    for cmd in cmnds:
+        blue(f"[*] {cmd['msg']}")
+        for item in cmd['cmnds']:
+            yellow(f"[*] {item['desc']}")
+            os.system(item['cmd'])
