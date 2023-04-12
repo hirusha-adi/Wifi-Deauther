@@ -22,6 +22,10 @@ def green(*args, **kwargs):
     print(_Colors.GREEN, *args, **kwargs)
 
 
+def yellow(*args, **kwargs):
+    print(_Colors.YELLOW, *args, **kwargs)
+
+
 def red(*args, **kwargs):
     print(_Colors.RED, *args, **kwargs)
 
