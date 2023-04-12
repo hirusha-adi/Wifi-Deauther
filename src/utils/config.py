@@ -99,7 +99,7 @@ def setMonitorMode(adapter: WirelessAdapter) -> None:
     except subprocess.CalledProcessError as e:
         red("Command failed with error code:", e.returncode)
 
-    __setMonitorModeAuto(adapter=adapter)
+    # __setMonitorModeAuto(adapter=adapter)
     __setMonitorModeCustom(adapter=adapter)
 
     for adp2 in commands.getAdapters():
